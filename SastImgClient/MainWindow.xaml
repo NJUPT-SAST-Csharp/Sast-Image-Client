@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Window
+    x:Class="SastImgClient.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:SastImgClient"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="using:System"
+    Title="Sast Image Client"
+    mc:Ignorable="d">
+
+    <Grid>
+
+
+        <NavigationView
+            BackRequested="NavigatePageBack"
+            IsBackEnabled="{x:Bind Navigation.CanBack, Mode=OneWay}"
+            IsPaneOpen="False"
+            ItemInvoked="NavigatePageTo">
+            <NavigationView.MenuItems>
+                <NavigationViewItem
+                    Content="Main"
+                    Icon="Home"
+                    Tag="MainPage" />
+
+            </NavigationView.MenuItems>
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem
+                    Content="Login"
+                    Icon="People"
+                    Tag="LoginPage" />
+            </NavigationView.FooterMenuItems>
+            <Frame Content="{x:Bind Navigation.CurrentPage, Mode=OneWay}" IsNavigationStackEnabled="False" />
+        </NavigationView>
+    </Grid>
+
+</Window>

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SastImgClient (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "SastImgClient (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
