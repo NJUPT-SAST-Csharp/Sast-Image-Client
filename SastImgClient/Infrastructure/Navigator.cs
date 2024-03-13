@@ -1,20 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
 using SastImgClient.Pages;
 
 namespace SastImgClient.Infrastructure
 {
-    internal sealed partial class Navigator(IEnumerable<IPageView> pages)
-        : ObservableObject,
-            INavigator
+    internal sealed partial class Navigator : ObservableObject, INavigator
     {
-        private readonly Stack<string> _forwardPages = new();
-        private readonly Stack<string> _backPages = new();
+        public Navigator(IEnumerable<IPageView> pages, Frame frame)
+        {
+            _pages = pages.ToList();
+            _frame = frame;
 
-        private readonly Dictionary<string, IPageView> _pages = pages
-            .Select(p => (p.Key, p))
-            .ToDictionary();
+            var mainPage = pages.First(p => p.Key == nameof(MainPage));
+            _currentPage = mainPage;
+            _frame.Content = mainPage;
+        }
+
+        private readonly Frame _frame;
+
+        private readonly Stack<IPageView> _forwardPages = new();
+        private readonly Stack<IPageView> _backPages = new();
+
+        private readonly IReadOnlyList<IPageView> _pages;
 
         [ObservableProperty]
         private IPageView _currentPage;
@@ -25,15 +36,16 @@ namespace SastImgClient.Infrastructure
         [ObservableProperty]
         private bool _canForward = false;
 
-        public IEnumerable<IPageView> Pages => _pages.Values;
+        public IEnumerable<IPageView> Pages => _pages;
 
         public void Back()
         {
-            if (_backPages.TryPop(out var pageHash))
+            if (_backPages.TryPop(out var page))
             {
-                var page = _pages[pageHash];
-                _forwardPages.Push(pageHash);
+                _forwardPages.Push(page);
                 CurrentPage = page;
+
+                _frame.Navigate(page.PageType, null, _frameTransitionInfo);
 
                 CheckBackAndForward();
             }
@@ -41,10 +53,12 @@ namespace SastImgClient.Infrastructure
 
         public void Forward()
         {
-            if (_forwardPages.TryPop(out var pageHash))
+            if (_forwardPages.TryPop(out var page))
             {
-                _backPages.Push(CurrentPage.Key);
-                CurrentPage = _pages[pageHash];
+                _backPages.Push(CurrentPage);
+                CurrentPage = page;
+
+                _frame.Navigate(page.PageType, null, _frameTransitionInfo);
 
                 CheckBackAndForward();
             }
@@ -53,40 +67,55 @@ namespace SastImgClient.Infrastructure
         public void NavigateTo<T>()
             where T : IPageView
         {
-            var page = _pages.Values.OfType<T>().First() as IPageView;
+            var page = _pages.OfType<T>().First() as IPageView;
 
             if (CurrentPage == page)
             {
                 return;
             }
 
-            _backPages.Push(CurrentPage.Key);
+            _backPages.Push(CurrentPage);
             _forwardPages.Clear();
             CurrentPage = page;
+
+            _frame.Navigate(page.PageType, null, _frameTransitionInfo);
 
             CheckBackAndForward();
         }
 
-        public void NavigateTo(string pageName)
+        public void NavigateTo(string pageKey)
         {
-            var page = _pages.Values.First(p => p.Key == pageName);
-
-            if (CurrentPage == page)
+            if (CurrentPage.Key == pageKey)
             {
                 return;
             }
 
-            _backPages.Push(CurrentPage.Key);
+            var page = _pages.First(p => p.Key == pageKey);
+
+            _backPages.Push(CurrentPage);
             _forwardPages.Clear();
             CurrentPage = page;
+
+            _frame.Navigate(page.PageType, null, _frameTransitionInfo);
 
             CheckBackAndForward();
         }
 
-        public void InitializePage<T>()
-            where T : IPageView
+        public void NavigateTo(Type pageType)
         {
-            CurrentPage = _pages.Values.OfType<T>().First();
+            if (CurrentPage.PageType == pageType)
+            {
+                return;
+            }
+
+            var page = _pages.First(p => p.PageType == pageType);
+            _backPages.Push(CurrentPage);
+            _forwardPages.Clear();
+            CurrentPage = page;
+
+            _frame.Navigate(page.PageType, null, _frameTransitionInfo);
+
+            CheckBackAndForward();
         }
 
         private void CheckBackAndForward()
@@ -94,5 +123,21 @@ namespace SastImgClient.Infrastructure
             CanForward = _forwardPages.Count > 0;
             CanBack = _backPages.Count > 0;
         }
+
+        private void InitFrame()
+        {
+            _frame.Content = _pages.First(p => p.Key == nameof(MainPage));
+            _frame.IsNavigationStackEnabled = false;
+            _frame.ContentTransitions =
+            [
+                new NavigationThemeTransition()
+                {
+                    DefaultNavigationTransitionInfo = new SlideNavigationTransitionInfo()
+                }
+            ];
+        }
+
+        private SlideNavigationTransitionInfo _frameTransitionInfo =>
+            new() { Effect = (SlideNavigationTransitionEffect)Random.Shared.Next(0, 3) };
     }
 }

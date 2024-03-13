@@ -7,10 +7,64 @@
     xmlns:local="using:SastImgClient.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    NavigationCacheMode="Enabled"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <Style x:Key="MainStackPanel" TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Vertical" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
 
-    <Grid>
-        <TextBlock>I'm Login Page</TextBlock>
-    </Grid>
+        <Style x:Key="InnerStackPanel" TargetType="StackPanel">
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="Orientation" Value="Horizontal" />
+        </Style>
+
+        <Style x:Key="LabelTextBlock" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontFamily" Value="Consolas" />
+        </Style>
+
+        <Style x:Key="PasswordInput" TargetType="PasswordBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Width" Value="200" />
+        </Style>
+
+        <Style x:Key="UsernameInput" TargetType="TextBox">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Width" Value="200" />
+        </Style>
+
+        <Style x:Key="LoginButton" TargetType="Button">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Width" Value="310" />
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="FontFamily" Value="Consolas" />
+        </Style>
+    </Page.Resources>
+
+    <StackPanel Style="{StaticResource MainStackPanel}">
+        <StackPanel Style="{StaticResource InnerStackPanel}">
+            <TextBlock Style="{StaticResource LabelTextBlock}" Text="Username" />
+            <TextBox Style="{StaticResource UsernameInput}" />
+        </StackPanel>
+        <StackPanel Style="{StaticResource InnerStackPanel}">
+            <TextBlock Style="{StaticResource LabelTextBlock}" Text="Password" />
+            <PasswordBox Style="{StaticResource PasswordInput}" />
+        </StackPanel>
+
+        <StackPanel Style="{StaticResource InnerStackPanel}">
+            <Button Content="Login" Style="{StaticResource LoginButton}" />
+        </StackPanel>
+    </StackPanel>
 </Page>

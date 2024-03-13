@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using SastImgClient.Components;
 using SastImgClient.Infrastructure;
 using SastImgClient.Pages;
 
@@ -14,6 +16,7 @@ namespace SastImgClient
     public partial class App : Application
     {
         private readonly IServiceCollection _services = new ServiceCollection();
+        private Window m_window;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -32,24 +35,21 @@ namespace SastImgClient
         {
             ConfigureServices();
             var provider = _services.BuildServiceProvider();
-            m_window = new MainWindow(
-                provider.GetRequiredService<MainWindowVm>(),
-                provider.GetRequiredService<INavigator>()
-            );
+
+            m_window = new MainWindow(provider.GetRequiredService<NavigationMenu>());
 
             m_window.Activate();
         }
-
-        private Window m_window;
 
         private void ConfigureServices()
         {
             _services.AddSingleton<INavigator, Navigator>();
 
-            _services.AddSingleton<MainWindowVm>();
             _services.AddSingleton<LoginPageVm>();
             _services.AddSingleton<MainPageVm>();
 
+            _services.AddSingleton<Frame>();
+            _services.AddSingleton<NavigationMenu>();
             _services.AddSingleton<IPageView, LoginPage>();
             _services.AddSingleton<IPageView, MainPage>();
         }

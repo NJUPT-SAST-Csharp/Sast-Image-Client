@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using SastImgClient.Pages;
 
@@ -6,9 +7,8 @@ namespace SastImgClient.Infrastructure
 {
     internal interface INavigator : INotifyPropertyChanged
     {
-        public void InitializePage<T>()
-            where T : IPageView;
         public void NavigateTo(string pageName);
+        public void NavigateTo(Type pageType);
         public void NavigateTo<T>()
             where T : IPageView;
 

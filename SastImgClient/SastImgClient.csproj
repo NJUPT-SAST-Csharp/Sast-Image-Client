@@ -13,6 +13,7 @@
 	<UseRidGraph>true</UseRidGraph>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Components\NavigationMenu.xaml" />
     <None Remove="Pages\LoginPage\LoginPage.xaml" />
     <None Remove="Pages\MainPage\MainPage.xaml" />
   </ItemGroup>
@@ -51,6 +52,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Pages\MainPage\MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Components\NavigationMenu.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
