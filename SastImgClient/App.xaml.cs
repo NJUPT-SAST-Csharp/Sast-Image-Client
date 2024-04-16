@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SastImgClient.Components;
@@ -43,15 +45,29 @@ namespace SastImgClient
 
         private void ConfigureServices()
         {
+            var types = Assembly.GetAssembly(typeof(App)).GetTypes();
+
             _services.AddSingleton<INavigator, Navigator>();
-
-            _services.AddSingleton<LoginPageVm>();
-            _services.AddSingleton<MainPageVm>();
-
-            _services.AddSingleton<Frame>();
             _services.AddSingleton<NavigationMenu>();
-            _services.AddSingleton<IPageView, LoginPage>();
-            _services.AddSingleton<IPageView, MainPage>();
+
+            var pages = Array.FindAll(types, type => type.BaseType == typeof(Page));
+
+            Array.ForEach(
+                pages,
+                page =>
+                {
+                    var interfaceType = Array.Find(
+                        page.GetInterfaces(),
+                        i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IPageView<>)
+                    );
+                    _services.AddSingleton(typeof(IPageView), page);
+                    _services.AddSingleton(interfaceType, page);
+
+                    var viewmodelType = interfaceType.GetGenericArguments()[0];
+                    _services.AddSingleton(typeof(IPageViewModel), viewmodelType);
+                    _services.AddSingleton(viewmodelType);
+                }
+            );
         }
     }
 }

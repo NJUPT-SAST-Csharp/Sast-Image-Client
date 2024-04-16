@@ -1,3 +1,5 @@
+using System.Collections.Frozen;
+using System.Linq;
 using Microsoft.UI.Xaml.Controls;
 using SastImgClient.Infrastructure;
 
@@ -8,20 +10,31 @@ namespace SastImgClient.Components
 {
     internal sealed partial class NavigationMenu : UserControl
     {
-        public NavigationMenu(INavigator navigation, Frame frame)
+        private readonly FrozenSet<NavigationViewItem> _items;
+
+        public NavigationMenu(INavigator navigation)
         {
             Navigation = navigation;
-
             this.InitializeComponent();
 
-            NavView.Content = frame;
+            _items = NavView
+                .MenuItems.Union(NavView.FooterMenuItems)
+                .Cast<NavigationViewItem>()
+                .ToFrozenSet();
+
+            NavView.SelectedItem = _items.First(
+                i => (i.Tag as string) == Navigation.CurrentPage.Key
+            );
         }
 
         public INavigator Navigation { get; }
 
-        private void NavigatePageTo(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+        private void NavigatePageTo(
+            NavigationView sender,
+            NavigationViewSelectionChangedEventArgs args
+        )
         {
-            var item = sender.SelectedItem as NavigationViewItem;
+            var item = args.SelectedItem as NavigationViewItem;
 
             Navigation.NavigateTo(item.Tag as string);
         }
@@ -32,6 +45,9 @@ namespace SastImgClient.Components
         )
         {
             Navigation.Back();
+            NavView.SelectedItem = _items.First(
+                i => (i.Tag as string) == Navigation.CurrentPage.Key
+            );
         }
     }
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="SastImgClient.Pages.Images.ImagesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:core="using:SastImgClient.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <DataTemplate x:Key="ImageListTemplate" x:DataType="core:ImageItem">
+            <ItemContainer>
+                <Grid>
+                    <TextBlock Text="{x:Bind Id}" />
+                    <Image Source="{x:Bind Url}" />
+                </Grid>
+            </ItemContainer>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <Button Command="{x:Bind ViewModel.LoadImagesCommand}" Content="Load Images" />
+                <Button Command="{x:Bind ViewModel.ClearImagesCommand}" Content="Clear" />
+            </StackPanel>
+            <ItemsView ItemTemplate="{StaticResource ImageListTemplate}" ItemsSource="{x:Bind ViewModel.Images, Mode=OneWay}">
+                <ItemsView.Layout>
+                    <LinedFlowLayout LineHeight="160" />
+                </ItemsView.Layout>
+            </ItemsView>
+        </StackPanel>
+    </Grid>
+</Page>

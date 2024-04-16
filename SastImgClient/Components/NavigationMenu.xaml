@@ -8,29 +8,48 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid>
+    <UserControl.Resources>
 
+    </UserControl.Resources>
+
+    <Grid>
         <NavigationView
             x:Name="NavView"
             BackRequested="NavigatePageBack"
+            Content="{x:Bind Navigation.CurrentPage, Mode=OneWay}"
             IsBackEnabled="{x:Bind Navigation.CanBack, Mode=OneWay}"
             IsPaneOpen="False"
-            ItemInvoked="NavigatePageTo">
+            IsSettingsVisible="False"
+            SelectionChanged="NavigatePageTo">
+
+            <NavigationView.Transitions>
+                <EntranceThemeTransition />
+            </NavigationView.Transitions>
+
 
             <NavigationView.MenuItems>
                 <NavigationViewItem
                     Content="Main"
                     Icon="Home"
                     Tag="MainPage" />
+                <NavigationViewItem
+                    Content="Images"
+                    Icon="Pictures"
+                    Tag="ImagesPage" />
             </NavigationView.MenuItems>
 
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem
-                    Content="Login"
+                    Content="Profile"
                     Icon="People"
-                    Tag="LoginPage" />
+                    Tag="ProfilePage" />
+                <NavigationViewItem
+                    Content="Settings"
+                    Icon="Setting"
+                    Tag="SettingsPage" />
             </NavigationView.FooterMenuItems>
-
         </NavigationView>
+
+
     </Grid>
 </UserControl>

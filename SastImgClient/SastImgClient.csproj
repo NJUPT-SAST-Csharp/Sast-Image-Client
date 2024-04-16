@@ -14,8 +14,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Components\NavigationMenu.xaml" />
-    <None Remove="Pages\LoginPage\LoginPage.xaml" />
-    <None Remove="Pages\MainPage\MainPage.xaml" />
+    <None Remove="Pages\Profile\ProfilePage.xaml" />
+    <None Remove="Pages\Main\MainPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,11 +29,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.230913002" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240404000" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
+    <PackageReference Include="WinUIEx" Version="2.3.4" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -46,7 +46,10 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Pages\LoginPage\LoginPage.xaml">
+    <ProjectReference Include="..\SastImgClient.Core\SastImgClient.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\LoginPage\ProfilePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
