@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SastImgClient.Components;
 using SastImgClient.Infrastructure;
-using SastImgClient.Pages;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -18,7 +18,6 @@ namespace SastImgClient
     public partial class App : Application
     {
         private readonly IServiceCollection _services = new ServiceCollection();
-        private Window m_window;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -35,39 +34,69 @@ namespace SastImgClient
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
-            ConfigureServices();
-            var provider = _services.BuildServiceProvider();
+            var services = ConfigureServices(_services);
 
-            m_window = new MainWindow(provider.GetRequiredService<NavigationMenu>());
+            var pageGroup = services
+                .GetServices<IPageView>()
+                .GroupBy(page => page.Key)
+                .FirstOrDefault(group => group.Count() > 1);
 
-            m_window.Activate();
+            if (pageGroup is not null)
+            {
+                throw new InvalidOperationException("Duplicated page key: " + pageGroup.Key);
+            }
+
+            services.GetRequiredService<MainWindow>().Activate();
         }
 
-        private void ConfigureServices()
+        private IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var types = Assembly.GetAssembly(typeof(App)).GetTypes();
+            var types = Assembly.GetAssembly(typeof(App))!.GetTypes();
 
-            _services.AddSingleton<INavigator, Navigator>();
-            _services.AddSingleton<NavigationMenu>();
+            services.AddSingleton<MainWindow>();
+
+            services.AddSingleton<INavigator, Navigator>();
+            services.AddSingleton<NavigationMenu>();
 
             var pages = Array.FindAll(types, type => type.BaseType == typeof(Page));
 
-            Array.ForEach(
-                pages,
-                page =>
-                {
-                    var interfaceType = Array.Find(
+            foreach (var page in pages)
+            {
+                var interfaceType =
+                    Array.Find(
                         page.GetInterfaces(),
                         i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IPageView<>)
-                    );
-                    _services.AddSingleton(typeof(IPageView), page);
-                    _services.AddSingleton(interfaceType, page);
+                    ) ?? throw new NullReferenceException();
 
-                    var viewmodelType = interfaceType.GetGenericArguments()[0];
-                    _services.AddSingleton(typeof(IPageViewModel), viewmodelType);
-                    _services.AddSingleton(viewmodelType);
-                }
-            );
+                // IPageView
+                services.AddSingleton(typeof(IPageView), page);
+                services.AddKeyedSingleton(
+                    typeof(IPageView),
+                    page.Name,
+                    (s, name) => s.GetServices<IPageView>().First(s => s.Key == (string)name!)
+                );
+                services.AddSingleton(page, s => s.GetRequiredKeyedService<IPageView>(page.Name));
+
+                // IPageView<>
+                services.AddSingleton(
+                    interfaceType,
+                    s =>
+                        s.GetServices<IPageView>()
+                            .First(p => p.GetType().IsAssignableTo(interfaceType))
+                );
+
+                // IPageViewModel
+                var viewmodelType = interfaceType.GetGenericArguments()[0];
+                services.AddSingleton(typeof(IPageViewModel), viewmodelType);
+                services.AddSingleton(
+                    viewmodelType,
+                    s =>
+                        s.GetServices<IPageViewModel>()
+                            .First(p => p.GetType().IsAssignableTo(viewmodelType))
+                );
+            }
+
+            return services.BuildServiceProvider();
         }
     }
 }

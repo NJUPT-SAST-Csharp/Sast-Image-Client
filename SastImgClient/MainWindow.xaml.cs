@@ -13,11 +13,14 @@ namespace SastImgClient
     {
         public MainWindow(NavigationMenu menu)
         {
-            InitializeComponent();
-            Content = menu;
-
             MinWidth = 800;
             MinHeight = 600;
+
+            Width = 1000;
+            Height = 618;
+
+            InitializeComponent();
+            Content = menu;
         }
     }
 }

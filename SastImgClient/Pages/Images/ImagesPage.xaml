@@ -10,27 +10,10 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <DataTemplate x:Key="ImageListTemplate" x:DataType="core:ImageItem">
-            <ItemContainer>
-                <Grid>
-                    <TextBlock Text="{x:Bind Id}" />
-                    <Image Source="{x:Bind Url}" />
-                </Grid>
-            </ItemContainer>
-        </DataTemplate>
+
     </Page.Resources>
 
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <StackPanel Orientation="Horizontal">
-                <Button Command="{x:Bind ViewModel.LoadImagesCommand}" Content="Load Images" />
-                <Button Command="{x:Bind ViewModel.ClearImagesCommand}" Content="Clear" />
-            </StackPanel>
-            <ItemsView ItemTemplate="{StaticResource ImageListTemplate}" ItemsSource="{x:Bind ViewModel.Images, Mode=OneWay}">
-                <ItemsView.Layout>
-                    <LinedFlowLayout LineHeight="160" />
-                </ItemsView.Layout>
-            </ItemsView>
-        </StackPanel>
+        <TextBlock Text="I'm ImagesPage." />
     </Grid>
 </Page>

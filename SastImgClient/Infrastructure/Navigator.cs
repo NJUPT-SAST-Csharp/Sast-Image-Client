@@ -2,28 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
-using SastImgClient.Pages;
-using SastImgClient.Pages.Main;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SastImgClient.Infrastructure
 {
-    internal sealed partial class Navigator : ObservableObject, INavigator
+    internal sealed partial class Navigator(IServiceProvider services)
+        : ObservableObject,
+            INavigator
     {
-        public Navigator(IEnumerable<IPageView> pages)
-        {
-            _pages = pages.ToList();
-
-            var mainPage = pages.First(p => p.Key == nameof(MainPage));
-            _currentPage = mainPage;
-        }
-
         private readonly Stack<IPageView> _forwardPages = new();
         private readonly Stack<IPageView> _backPages = new();
-
-        private readonly IReadOnlyList<IPageView> _pages;
+        private readonly IServiceProvider _services = services;
 
         [ObservableProperty]
-        private IPageView _currentPage;
+        private IPageView _currentPage = null!;
 
         [ObservableProperty]
         private bool _canBack = false;
@@ -31,10 +23,9 @@ namespace SastImgClient.Infrastructure
         [ObservableProperty]
         private bool _canForward = false;
 
-        public IEnumerable<IPageView> Pages => _pages;
+        public event PageChangedEventHandler? OnPageChanged;
 
-        public Action<IPageView, IPageView> OnNavigating { get; set; }
-        public Action<IPageView, IPageView> OnNavigated { get; set; }
+        public IReadOnlyCollection<IPageView> Pages => _services.GetServices<IPageView>().ToList();
 
         public void Back()
         {
@@ -42,8 +33,6 @@ namespace SastImgClient.Infrastructure
             {
                 _forwardPages.Push(page);
                 CurrentPage = page;
-
-                CheckBackAndForward();
             }
         }
 
@@ -53,58 +42,92 @@ namespace SastImgClient.Infrastructure
             {
                 _backPages.Push(CurrentPage);
                 CurrentPage = page;
-
-                CheckBackAndForward();
             }
         }
 
-        public void NavigateTo<T>()
+        public bool NavigateTo<T>()
             where T : IPageView
         {
-            var page = _pages.OfType<T>().First() as IPageView;
+            var page = _services.GetRequiredService<T>();
 
-            if (CurrentPage == page)
+            if (CanNavigate(page) == false)
             {
-                return;
+                return false;
             }
 
             _backPages.Push(CurrentPage);
             _forwardPages.Clear();
             CurrentPage = page;
 
-            CheckBackAndForward();
+            return true;
         }
 
-        public void NavigateTo(string pageKey)
+        public bool NavigateTo(string pageKey)
         {
-            if (CurrentPage.Key == pageKey)
-            {
-                return;
-            }
+            var page = _services.GetRequiredKeyedService<IPageView>(pageKey);
 
-            var page = _pages.First(p => p.Key == pageKey);
+            if (CanNavigate(page) == false)
+            {
+                return false;
+            }
 
             _backPages.Push(CurrentPage);
             _forwardPages.Clear();
             CurrentPage = page;
 
-            CheckBackAndForward();
+            return true;
         }
 
-        private void CheckBackAndForward()
+        public void ClearNavigationHistory()
+        {
+            _backPages.Clear();
+            _forwardPages.Clear();
+            UpdateStacks();
+        }
+
+        private bool CanNavigate(IPageView page)
+        {
+            var type = typeof(IBeforeNavigateBehavior<,>).MakeGenericType(
+                [CurrentPage.GetType(), page.GetType()]
+            );
+
+            var tag = _services
+                .GetServices(type)
+                .Cast<IBeforeNavigatorBehavior>()
+                .All(behavior => behavior.CanNavigate);
+
+            return true;
+        }
+
+        partial void OnCurrentPageChanged(IPageView? oldValue, IPageView newValue)
+        {
+            UpdateStacks();
+            OnPageChanged?.Invoke(this, new(oldValue!, newValue));
+        }
+
+        private void UpdateStacks()
         {
             CanForward = _forwardPages.Count > 0;
             CanBack = _backPages.Count > 0;
         }
 
-        partial void OnCurrentPageChanging(IPageView oldValue, IPageView newValue)
+        public void Initialize(string pageName)
         {
-            OnNavigating?.Invoke(oldValue, newValue);
+            if (CurrentPage is not null)
+            {
+                return;
+            }
+            CurrentPage = _services.GetRequiredKeyedService<IPageView>(pageName);
         }
 
-        partial void OnCurrentPageChanged(IPageView oldValue, IPageView newValue)
+        public void Initialize<T>()
+            where T : IPageView
         {
-            OnNavigated?.Invoke(oldValue, newValue);
+            if (CurrentPage is not null)
+            {
+                return;
+            }
+            CurrentPage = _services.GetRequiredService<T>();
         }
     }
 }

@@ -2,6 +2,7 @@
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 using Microsoft.UI.Xaml.Controls;
+using SastImgClient.Infrastructure;
 
 namespace SastImgClient.Pages.Profile
 {

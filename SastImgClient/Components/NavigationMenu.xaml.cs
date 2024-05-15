@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Linq;
 using Microsoft.UI.Xaml.Controls;
 using SastImgClient.Infrastructure;
+using SastImgClient.Pages.Main;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -12,9 +13,10 @@ namespace SastImgClient.Components
     {
         private readonly FrozenSet<NavigationViewItem> _items;
 
+        private NavigationViewItem? _previousItem = null;
+
         public NavigationMenu(INavigator navigation)
         {
-            Navigation = navigation;
             this.InitializeComponent();
 
             _items = NavView
@@ -22,22 +24,17 @@ namespace SastImgClient.Components
                 .Cast<NavigationViewItem>()
                 .ToFrozenSet();
 
-            NavView.SelectedItem = _items.First(
-                i => (i.Tag as string) == Navigation.CurrentPage.Key
-            );
+            Navigation = navigation;
+            Navigation.Initialize<MainPage>();
+            Navigation.OnPageChanged += OnPageChanged;
+
+            var item = _items.First(i => (i.Tag as string) == Navigation.CurrentPage.Key);
+            NavView.SelectedItem = item;
+
+            _previousItem = item;
         }
 
         public INavigator Navigation { get; }
-
-        private void NavigatePageTo(
-            NavigationView sender,
-            NavigationViewSelectionChangedEventArgs args
-        )
-        {
-            var item = args.SelectedItem as NavigationViewItem;
-
-            Navigation.NavigateTo(item.Tag as string);
-        }
 
         private void NavigatePageBack(
             NavigationView sender,
@@ -45,9 +42,30 @@ namespace SastImgClient.Components
         )
         {
             Navigation.Back();
-            NavView.SelectedItem = _items.First(
+        }
+
+        private void NavigationPageTo(
+            NavigationView sender,
+            NavigationViewItemInvokedEventArgs args
+        )
+        {
+            if ((NavigationViewItem)sender.SelectedItem == _previousItem)
+            {
+                return;
+            }
+
+            var item = (NavigationViewItem)sender.SelectedItem;
+
+            Navigation.NavigateTo((string)item.Tag);
+        }
+
+        void OnPageChanged(object? sender, PageChangedEventArgs args)
+        {
+            NavView.SelectedItem = _items.FirstOrDefault(
                 i => (i.Tag as string) == Navigation.CurrentPage.Key
             );
+
+            _previousItem = (NavigationViewItem?)NavView.SelectedItem;
         }
     }
 }

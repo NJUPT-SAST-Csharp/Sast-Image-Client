@@ -19,7 +19,7 @@
             IsBackEnabled="{x:Bind Navigation.CanBack, Mode=OneWay}"
             IsPaneOpen="False"
             IsSettingsVisible="False"
-            SelectionChanged="NavigatePageTo">
+            ItemInvoked="NavigationPageTo">
 
             <NavigationView.Transitions>
                 <TransitionCollection>
