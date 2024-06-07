@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using FoxNavigator;
+using FoxNavigator.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SastImgClient.Components;
-using SastImgClient.Infrastructure;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -46,14 +47,12 @@ namespace SastImgClient
                 throw new InvalidOperationException("Duplicated page key: " + pageGroup.Key);
             }
 
-            services.GetRequiredService<MainWindow>().Activate();
+            new MainWindow(services.GetRequiredService<NavigationMenu>()).Activate();
         }
 
         private IServiceProvider ConfigureServices(IServiceCollection services)
         {
             var types = Assembly.GetAssembly(typeof(App))!.GetTypes();
-
-            services.AddSingleton<MainWindow>();
 
             services.AddSingleton<INavigator, Navigator>();
             services.AddSingleton<NavigationMenu>();

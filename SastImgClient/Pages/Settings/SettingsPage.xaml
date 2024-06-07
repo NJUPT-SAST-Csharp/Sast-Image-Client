@@ -13,6 +13,10 @@
 
 
     <Grid>
-        <TextBlock Text="SettingsPage" />
+        <RadioButtons x:Name="Buttons" Header="Theme" SelectionChanged="ThemeChanged">
+            <x:String>System</x:String>
+            <x:String>Light</x:String>
+            <x:String>Dark</x:String>
+        </RadioButtons>
     </Grid>
 </Page>

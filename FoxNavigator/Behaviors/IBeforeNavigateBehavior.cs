@@ -1,4 +1,6 @@
-﻿namespace SastImgClient.Infrastructure
+﻿using FoxNavigator.Pages;
+
+namespace FoxNavigator.Behaviors
 {
     public interface IBeforeNavigateBehavior<TSourcePage, TTargetPage> : IBeforeNavigatorBehavior
         where TTargetPage : IPageView

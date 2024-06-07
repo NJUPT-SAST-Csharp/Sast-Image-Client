@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using FoxNavigator.Behaviors;
+using FoxNavigator.Pages;
 
-namespace SastImgClient.Infrastructure
+namespace FoxNavigator
 {
-    internal interface INavigator : INotifyPropertyChanged
+    public interface INavigator : INotifyPropertyChanged
     {
         public void Initialize(string pageName);
         public void Initialize<T>()

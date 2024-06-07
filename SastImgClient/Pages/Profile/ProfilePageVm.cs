@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using SastImgClient.Infrastructure;
+using FoxNavigator.Pages;
 
 namespace SastImgClient.Pages.Profile
 {

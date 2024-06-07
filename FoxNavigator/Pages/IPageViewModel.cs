@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace SastImgClient.Infrastructure
+namespace FoxNavigator.Pages
 {
     public interface IPageViewModel : INotifyPropertyChanged, INotifyPropertyChanging { }
 }

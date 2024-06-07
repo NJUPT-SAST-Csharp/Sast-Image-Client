@@ -1,6 +1,7 @@
 ﻿using System;
+using FoxNavigator.Pages;
 
-namespace SastImgClient.Infrastructure
+namespace FoxNavigator.Behaviors
 {
     public sealed class PageChangedEventArgs(IPageView from, IPageView to) : EventArgs
     {

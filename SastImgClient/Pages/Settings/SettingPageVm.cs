@@ -1,10 +1,20 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using SastImgClient.Infrastructure;
+using FoxNavigator.Pages;
+using Microsoft.UI.Xaml;
+using Windows.Storage;
 
 namespace SastImgClient.Pages.Settings
 {
-    internal sealed partial class SettingPageVm : ObservableObject, IPageViewModel
+    internal sealed partial class SettingsPageVm : ObservableObject, IPageViewModel
     {
-        public SettingPageVm() { }
+        public SettingsPageVm() { }
+
+        [ObservableProperty]
+        private ElementTheme _currentTheme = ElementTheme.Default;
+
+        partial void OnCurrentThemeChanged(ElementTheme value)
+        {
+            ApplicationData.Current.LocalSettings.Values["Theme"] = value.ToString();
+        }
     }
 }

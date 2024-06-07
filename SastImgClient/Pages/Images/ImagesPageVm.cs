@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using FoxNavigator.Pages;
 using SastImgClient.Core;
-using SastImgClient.Infrastructure;
 
 namespace SastImgClient.Pages.Images
 {

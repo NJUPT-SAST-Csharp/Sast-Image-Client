@@ -1,5 +1,5 @@
+using FoxNavigator.Pages;
 using Microsoft.UI.Xaml.Controls;
-using SastImgClient.Infrastructure;
 
 namespace SastImgClient.Pages.Video
 {
@@ -11,7 +11,6 @@ namespace SastImgClient.Pages.Video
         public VideoPage(VideoPageVm viewmodel)
         {
             this.InitializeComponent();
-            Media.MediaPlayer.Volume = 0.5;
             ViewModel = viewmodel;
         }
 

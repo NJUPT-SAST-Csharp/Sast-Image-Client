@@ -1,8 +1,10 @@
 using System.Collections.Frozen;
 using System.Linq;
+using FoxNavigator;
+using FoxNavigator.Behaviors;
 using Microsoft.UI.Xaml.Controls;
-using SastImgClient.Infrastructure;
 using SastImgClient.Pages.Main;
+using SastImgClient.Pages.Settings;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -15,8 +17,11 @@ namespace SastImgClient.Components
 
         private NavigationViewItem? _previousItem = null;
 
-        public NavigationMenu(INavigator navigation)
+        internal SettingsPageVm Settings { get; }
+
+        public NavigationMenu(INavigator navigation, SettingsPageVm settings)
         {
+            Settings = settings;
             this.InitializeComponent();
 
             _items = NavView
@@ -61,8 +66,8 @@ namespace SastImgClient.Components
 
         void OnPageChanged(object? sender, PageChangedEventArgs args)
         {
-            NavView.SelectedItem = _items.FirstOrDefault(
-                i => (i.Tag as string) == Navigation.CurrentPage.Key
+            NavView.SelectedItem = _items.FirstOrDefault(i =>
+                (i.Tag as string) == Navigation.CurrentPage.Key
             );
 
             _previousItem = (NavigationViewItem?)NavView.SelectedItem;

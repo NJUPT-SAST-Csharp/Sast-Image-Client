@@ -20,17 +20,6 @@
     <Grid>
         <StackPanel Orientation="Horizontal">
 
-            <ListView
-                x:Name="playList"
-                ItemTemplate="{StaticResource PlayListTemplate}"
-                ItemsSource="{x:Bind ViewModel.VideoList}" />
-
-            <MediaPlayerElement
-                x:Name="Media"
-                AreTransportControlsEnabled="True"
-                AutoPlay="False"
-                Source="{x:Bind conv:MediaSource.CreateFromUri(playList.SelectedItem.(core:VideoItem.Source)), Mode=OneWay}" />
-
         </StackPanel>
     </Grid>
 </Page>

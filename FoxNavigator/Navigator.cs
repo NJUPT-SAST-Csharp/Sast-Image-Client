@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using FoxNavigator.Behaviors;
+using FoxNavigator.Pages;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SastImgClient.Infrastructure
+namespace FoxNavigator
 {
-    internal sealed partial class Navigator(IServiceProvider services)
-        : ObservableObject,
-            INavigator
+    public sealed partial class Navigator(IServiceProvider services) : ObservableObject, INavigator
     {
         private readonly Stack<IPageView> _forwardPages = new();
         private readonly Stack<IPageView> _backPages = new();

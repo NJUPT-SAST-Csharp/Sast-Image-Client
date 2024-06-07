@@ -1,4 +1,4 @@
-﻿namespace SastImgClient.Infrastructure
+﻿namespace FoxNavigator.Pages
 {
     public interface IPageView
     {
